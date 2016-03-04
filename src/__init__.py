@@ -9,12 +9,12 @@ from io import BytesIO
 
 data = loadDataset('../data/catalog.xls', starting_year=1600, ordered=False)
 
-im = Image.open('../images/index.jpeg')
-descriptors = leargist.color_gist(im)
-im1 = Image.open('../images/gate7.jpeg')
-descr1 = leargist.color_gist(im1)
-im2 = Image.open('../images/vg.jpg')
-descr2 = leargist.color_gist(im2)
+# im = Image.open('../images/index.jpeg')
+# descriptors = leargist.color_gist(im)
+# im1 = Image.open('../images/gate7.jpeg')
+# descr1 = leargist.color_gist(im1)
+# im2 = Image.open('../images/vg.jpg')
+# descr2 = leargist.color_gist(im2)
 # print 1.0 - dis.cosine(descriptors, descr1)
 # print 1.0 - dis.cosine(descriptors, descr2)
 
@@ -39,6 +39,8 @@ for url in data.URL.values:
 
     i += 1
     print(str(i)+'th image processed...')
+    if i==50:
+        break
 
 end = time.time()
 print end - start
