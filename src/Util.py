@@ -17,6 +17,7 @@ def loadDataset(path, starting_year=0, ordered=True):
     data = data[data.YEAR >= starting_year]
     data.reset_index(drop=True, inplace=True)
 
+    # TODO if not ordered shuffle the dataset
     if ordered:
         data.sort_values(by=['YEAR'], inplace=True)
         data.reset_index(drop=True, inplace=True)

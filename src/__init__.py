@@ -9,7 +9,7 @@ from PIL import Image
 from io import BytesIO
 from collections import defaultdict
 from src.Util import loadDataset
-from paintings_dictionary_functions import get_distinct_similarities, get_max_min_pairs
+from paintings_dictionary_functions import get_distinct_similarities, get_max_min_pairs, set_innovations
 from classes.Painting import Painting
 
 # load dataset as a dataFrame
@@ -36,7 +36,7 @@ for index, row in data.iterrows():
     desc = leargist.color_gist(img)
 
     # create a Painting object and add it to the paintings and years dictionaries
-    painting = Painting(i, row.YEAR, row.AUTHOR, image_url, row.SCHOOL, desc)
+    painting = Painting(i, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL, desc)
     paintings[i] = painting
     years[int(row.YEAR)].append(painting)
 
@@ -73,38 +73,27 @@ plt.show()
 
 # find most and least similar pairs of paintings
 max_sim, max_pair,  min_sim, min_pair = get_max_min_pairs(paintings)
+
 print str(max_sim)+' '+paintings.get(max_pair[0]).get_url()+' '+paintings.get(max_pair[1]).get_url()
+min_0 = paintings.get(max_pair[0]).get_min_similarity()
+min_1 = paintings.get(max_pair[1]).get_min_similarity()
+print str(paintings.get(max_pair[0]).get_similarity(min_0))+' ' +\
+      paintings.get(max_pair[0]).get_url()+' ' + paintings.get(min_0).get_url()
+print str(paintings.get(max_pair[1]).get_similarity(min_1))+' ' +\
+      paintings.get(max_pair[1]).get_url()+' ' + paintings.get(min_1).get_url()
+print ''
+
 print str(min_sim)+' '+paintings.get(min_pair[0]).get_url()+' '+paintings.get(min_pair[1]).get_url()
+max_0 = paintings.get(min_pair[0]).get_max_similarity()
+max_1 = paintings.get(min_pair[1]).get_max_similarity()
+print str(paintings.get(min_pair[0]).get_similarity(max_0))+' ' +\
+      paintings.get(min_pair[0]).get_url()+' ' + paintings.get(max_0).get_url()
+print str(paintings.get(min_pair[1]).get_similarity(max_1))+' ' +\
+      paintings.get(min_pair[1]).get_url()+' ' + paintings.get(max_1).get_url()
 
-# Calculate innovation
-# Formula: 1.0 - (1/n) * /sum_1^n d_i
-years_back = 5
-top_paintings = 10
-for key in paintings:
-    # for each painting
-    painting = paintings.get(key)
-    similarity_list = []
 
-    # for the last years_back years find the top_paintings more similar paintings
-    for year in range(painting.get_year()-years_back, painting.get_year()):
-
-        # get a list of all paintings during 'year' year
-        paintings_in_year = years.get(year, list())
-        for painting_year in paintings_in_year:
-            # for each painting during year calculate similarity
-            similarity_list.append(painting.get_similarity(painting_year.get_id()))
-
-    # if list is empty meaning no painting during the past year_back years is found
-    if not similarity_list:
-        innovation = 0.0
-    else:
-        # sort and take the average of top_paintings most similar paintings
-        similarity_list.sort(reverse=True)
-        similarity_list = similarity_list[:top_paintings]
-        innovation = np.mean(similarity_list)
-
-    # set innovation of the painting
-    painting.set_innovation(1.0 - innovation)
+# Calculate innovations
+set_innovations(paintings, years, 5, 10)
 
 # Create a frame with two columns
 # YEAR, INNOVATION: average innovation per year

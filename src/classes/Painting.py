@@ -10,7 +10,7 @@ class Painting:
 
     def __init__(self, id_number, year, author, url, school, feature_vector):
         self.__id = id_number
-        self.__year = int(year)
+        self.__year = year
         self.__author = author
         self.__url = url
         self.__school = school
@@ -53,12 +53,15 @@ class Painting:
 
     def save_painting(self, path='../images/'):
         name = self.__url
-        name = name[25:]
+        name = name[23:]
         name = name[:-5]
         name = name.replace('/', '_')
 
+        image_url = self.__url.replace('/html', '/detail')
+        image_url = image_url.replace('.html', '.jpg')
+
         # download image
-        response = requests.get(self.__url)
+        response = requests.get(image_url)
         painting_file = BytesIO(response.content)
         img = Image.open(painting_file)
 
@@ -66,4 +69,4 @@ class Painting:
         img.save(path+name+'.png')
 
     def __str__(self):
-        return 'id: '+str(self.__id)+' year: '+str(int(self.__year))
+        return 'id: '+str(self.__id)+' year: '+str(self.__year)+' inno: '+str(self.__innovation)
