@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from urllib2 import quote
 
 __author__ = 'Helias'
 
