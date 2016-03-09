@@ -22,6 +22,9 @@ years = defaultdict(list)
 # paintings dictionary: for each id the corresponding Painting
 paintings = dict()
 
+# list of all feature lists -- later will be converted into matrix
+features_list = []
+
 # begin timer in order to see how long it takes to process images
 start = time.time()
 for index, row in data.iterrows():
@@ -35,6 +38,11 @@ for index, row in data.iterrows():
     img = Image.open(painting_file)
     desc = leargist.color_gist(img)
 
+    # unary feature vector
+    norm = np.linalg.norm(desc)
+    unary_desc = desc/norm
+    features_list.append(unary_desc.tolist())
+
     # create a Painting object and add it to the paintings and years dictionaries
     painting = Painting(i, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL, desc)
     paintings[i] = painting
@@ -45,8 +53,14 @@ for index, row in data.iterrows():
     if i == 10:
         break
 
+matrix = np.matrix(features_list)
+matrix_t = matrix.transpose()
+
 end = time.time()
 print 'Time to load images: '+str(end - start)
+
+# similarities matrix -- efficient way to calculate using matrix form
+similarities = matrix * matrix_t
 
 # Calculate similarities between feature vectors
 # Usage of cosine similarity
@@ -64,11 +78,21 @@ for key1 in paintings.keys():
 # save an image in the default folder
 # paintings.get(9).save_painting()
 
-distinct_similarities = get_distinct_similarities(paintings)
+# keep only distinct similarities in order to build the histogram
+triangle = np.triu_indices(len(similarities), 1)
+distinct_similarities_matrix = similarities[triangle]
+distinct_similarities = np.squeeze(np.asarray(distinct_similarities_matrix))
+del distinct_similarities_matrix
+
+my_bins = np.linspace(.0, 1.0, 100)
+plt.hist(distinct_similarities, bins=my_bins)
+plt.show()
+
+distinct_similarities1 = get_distinct_similarities(paintings)
 
 # Plot histogram of distinct similarities
 my_bins = np.linspace(.0, 1.0, 100)
-plt.hist(distinct_similarities, bins=my_bins)
+plt.hist(distinct_similarities1, bins=my_bins)
 plt.show()
 
 # find most and least similar pairs of paintings
