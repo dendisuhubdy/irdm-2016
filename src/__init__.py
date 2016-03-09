@@ -9,7 +9,7 @@ from PIL import Image
 from io import BytesIO
 from collections import defaultdict
 from src.Util import loadDataset
-from paintings_dictionary_functions import get_distinct_similarities, get_max_min_pairs, set_innovations
+from paintings_dictionary_functions import get_max_min_pairs, set_innovations
 from classes.Painting import Painting
 
 # load dataset as a dataFrame
@@ -25,10 +25,11 @@ paintings = dict()
 # list of all feature lists -- later will be converted into matrix
 features_list = []
 
+
 # begin timer in order to see how long it takes to process images
 start = time.time()
+# Process all images -- Create Image objects and add to the dictionary
 for index, row in data.iterrows():
-    i = index + 1   # begin counting from 1
 
     # get image and calculate GIST vector
     image_url = row.URL.replace('/html', '/detail')
@@ -38,19 +39,19 @@ for index, row in data.iterrows():
     img = Image.open(painting_file)
     desc = leargist.color_gist(img)
 
-    # unary feature vector
+    # unary feature vector - used later for cosine similarity in matrices form
     norm = np.linalg.norm(desc)
     unary_desc = desc/norm
     features_list.append(unary_desc.tolist())
 
     # create a Painting object and add it to the paintings and years dictionaries
-    painting = Painting(i, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL, desc)
-    paintings[i] = painting
+    painting = Painting(index, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL, desc)
+    paintings[index] = painting
     years[int(row.YEAR)].append(painting)
 
-    print(str(i)+'th image processed...')
+    print(str(index+1)+'th image processed...')
 
-    if i == 10:
+    if index + 1 == 2000:
         break
 
 matrix = np.matrix(features_list)
@@ -59,41 +60,38 @@ matrix_t = matrix.transpose()
 end = time.time()
 print 'Time to load images: '+str(end - start)
 
-# similarities matrix -- efficient way to calculate using matrix form
-similarities = matrix * matrix_t
-
 # Calculate similarities between feature vectors
 # Usage of cosine similarity
 # TODO try different similarity metrics
-for key1 in paintings.keys():
-    painting1 = paintings.get(key1)
-    for key2 in paintings.keys():
-        painting2 = paintings.get(key2)
-        if painting1 is not painting2:
-            # calculate similarity
-            similarity = 1.0 - dis.cosine(painting1.get_features(), painting2.get_features())
-            # set similarity for painting1
-            painting1.set_similarity(key2, similarity)
+# similarities matrix -- efficient way to calculate using matrix form because vectors are unary
+similarities = matrix * matrix_t
+del matrix, matrix_t
+
+# similarities to np.array instead of np.matrix
+similarities = np.asarray(similarities)
+
+# Populate Painting objects with similarities
+for i in range(0, len(similarities)):
+    sim_vector = similarities[i, :].tolist()
+    paintings.get(i).set_similarities(sim_vector)
 
 # save an image in the default folder
 # paintings.get(9).save_painting()
 
+# Build histogram of similarities
 # keep only distinct similarities in order to build the histogram
 triangle = np.triu_indices(len(similarities), 1)
-distinct_similarities_matrix = similarities[triangle]
-distinct_similarities = np.squeeze(np.asarray(distinct_similarities_matrix))
-del distinct_similarities_matrix
+distinct_similarities = np.squeeze(similarities[triangle])
 
 my_bins = np.linspace(.0, 1.0, 100)
 plt.hist(distinct_similarities, bins=my_bins)
 plt.show()
 
-distinct_similarities1 = get_distinct_similarities(paintings)
-
-# Plot histogram of distinct similarities
-my_bins = np.linspace(.0, 1.0, 100)
-plt.hist(distinct_similarities1, bins=my_bins)
-plt.show()
+# least similar paintings another way
+# diagonal elements of similarities are equal to 1.0
+# TODO set diagonal elements of similarities equal to nan and use different way to compare - see np.nanmin
+# i_min, j_min = np.unravel_index(similarities.argmin(), similarities.shape)
+# print(paintings.get(i_min).get_similarity(j_min))
 
 # find most and least similar pairs of paintings
 max_sim, max_pair,  min_sim, min_pair = get_max_min_pairs(paintings)

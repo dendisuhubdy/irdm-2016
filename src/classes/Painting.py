@@ -15,7 +15,7 @@ class Painting:
         self.__url = url
         self.__school = school
         self.__features = feature_vector
-        self.__similarities = dict()
+        self.__similarities = None
         self.__innovation = np.nan
 
     def get_id(self):
@@ -24,7 +24,7 @@ class Painting:
     def get_year(self):
         return self.__year
 
-    def get__author(self):
+    def get_author(self):
         return self.__author
 
     def get_url(self):
@@ -39,17 +39,18 @@ class Painting:
     def get_innovation(self):
         return self.__innovation
 
-    def set_similarity(self, image_id, score):
-        self.__similarities[image_id] = score
+    def set_similarities(self, similarities_list):
+        similarities_list[self.__id] = np.nan
+        self.__similarities = similarities_list
 
     def get_similarity(self, image_id):
-        return self.__similarities.get(image_id, 0.0)
+        return self.__similarities[image_id]
 
     def get_max_similarity(self):
-        return max(self.__similarities, key=self.__similarities.get)
+        return self.__similarities.index(np.nanmax(np.asarray(self.__similarities)))
 
     def get_min_similarity(self):
-        return min(self.__similarities, key=self.__similarities.get)
+        return self.__similarities.index(np.nanmin(np.asarray(self.__similarities)))
 
     def save_painting(self, path='../images/'):
         name = self.__url

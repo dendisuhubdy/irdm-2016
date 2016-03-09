@@ -1,21 +1,7 @@
 import numpy as np
+import pandas as pd
 
 __author__ = 'Helias'
-
-
-def get_distinct_similarities(paintings):
-    """
-    get_distinct_similarities: Given a collection of Painting objects (dictionary) returns the similarity
-    between each pair excluding similarities between one painting with itself
-    :param paintings: dictionary from any key (here an integer) to a Painting object
-    :return: an numpy array of all similarities between each pair of paintings
-    """
-    distinct_similarities = []
-    for key1 in paintings.keys():
-        for key2 in paintings.keys():
-            if key1 < key2:
-                distinct_similarities.append(paintings.get(key1).get_similarity(key2))
-    return np.array(distinct_similarities)
 
 
 def get_max_min_pairs(paintings):
@@ -80,3 +66,15 @@ def set_innovations(paintings, years, years_back=5, top_paintings=5):
 
         # set innovation of the painting
         painting.set_innovation(1.0 - innovation)
+
+
+# TODO have not checked that it works
+def paintings_to_csv(paintings, innovations=True, path='../results/'):
+    if innovations:
+        frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation'])
+        for key in paintings.keys:
+            p = paintings.get(key)
+            frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
+                                  'School': p.get_school(), 'URL': p.get_author,
+                                  'Innovation': p.get_innovation()})
+    frame.to_csv(path+'data_with_innovations.csv', ignore_index=True)
