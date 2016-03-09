@@ -21,6 +21,9 @@ def loadDataset(path, starting_year=0, ordered=True):
     if ordered:
         data.sort_values(by=['YEAR'], inplace=True)
         data.reset_index(drop=True, inplace=True)
+    else:
+        data = data.reindex(np.random.permutation(data.index))
+        data.reset_index(drop=True, inplace=True)
 
     data = data[['AUTHOR', 'YEAR', 'URL', 'SCHOOL']]
 
