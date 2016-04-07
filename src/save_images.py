@@ -18,11 +18,9 @@ list_file = open('../listimages.txt', 'w')
 for index, row in data.iterrows():
 
     painting = Painting(index, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL)
-
-    print(str(index+1)+' '+painting.get_name()+' '+painting.get_url())
     painting.save_painting(file=list_file)
 
-    # print(str(index+1)+'th image saved...')
+    print(str(index+1)+'th image saved...')
 
     # if index + 1 == 50:
     #     break
