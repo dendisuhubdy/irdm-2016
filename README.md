@@ -32,6 +32,20 @@ Need to install the following modules:
 leargist
 PIL
 ```
+Instructions for installing leargist can be found here: https://pypi.python.org/pypi/pyleargist
+
+Procedure
+---------------------
+We will briefly describe the procedure needed to be followed in order to run the code.
+>**Procedure**
+
+> - We run `save_images.py` script in order to save images on disc. This is needed in order to extract *classemes* and *picodes* features later.
+> - Default setting is to save images under */images* directory. A listimages.txt file is generated as well.
+> -  We need to download **vlg extractor** from [vlg](http://vlg.cs.dartmouth.edu/projects/vlg_extractor/vlg_extractor/Home.html/). We need to download parameters as well (5GB)
+> - For *linux* OS we need `opencv2.3.0`. This release is quite old so we need to download it from [opencv2.3](https://github.com/Itseez/opencv/releases/tag/2.3.0). After downloading it we need to compile it. Build FFMPEG option gives an error so we remove it as we do not need video analysis. We follow similar procedure as described [here](http://indranilsinharoy.com/2012/11/01/installing-opencv-on-linux/).
+> - build configuration: `cmake -D CMAKE_BUILD_TYPE=RELEASE -D WITH_FFMPEG=OFF -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_ZLIB=ON -D BUILD_PYTHON_SUPPORT=ON ~/opencv/opencv-2.3.0`
+> - Now we are ready to extract *classemes* and *picodes* using **vlg**. We run the following command: `./vlg_extractor --extract_classemes=FLOAT --extract_picodes2048=FLOAT --parameters-dir=parameters/parameters_1.1 ~/PycharmProjects/irdm-2016/listimages.txt ~/PycharmProjects/irdm-2016 ~/PycharmProjects/irdm-2016/features`. It saves features under `/features/images` directory if we stick with default configuration.
+> - We run `main.py` script for analysis.
 
 Literature Review
 --------------------
