@@ -1,5 +1,6 @@
 import requests
 import numpy as np
+import leargist
 from PIL import Image
 from io import BytesIO
 
@@ -81,8 +82,44 @@ class Painting:
         # save image
         img.save(path+name+'.png')
 
+        # write image path to listimages.txt file
         if file is not None:
             file.write(path[3:]+name+'.png\n')
+
+    def load_features(self, feats=['GIST', 'picodes2048', 'classemes'], features_path='../features/', images_path='../images/'):
+        """
+        load_features takes as input the list of desired features and computes the unary feature vector
+        :param feats: the features we want to take into account
+        :param features_path: the path to the picodes and classemes features
+        :param images_path: the path to the downloaded images -- In case images are not downloaded None.
+        if images_path == None get image through url. Used for GIST features
+        :return: It saves result in self.__features as a unary np.array
+        """
+
+        features = []
+        if 'GIST' in feats:
+            if images_path is None:
+                image_url = self.__url.replace('/html', '/detail')
+                image_url = image_url.replace('.html', '.jpg')
+
+                # get image through url
+                response = requests.get(image_url)
+                painting_file = BytesIO(response.content)
+                img = Image.open(painting_file)
+            else:
+                # load image from disc
+                img = Image.open(images_path+self.__name+'.png')
+
+            # compute GIST features and append to features
+            features.extend(leargist.color_gist(img).tolist())
+
+        for feat in feats:
+            file_name = features_path+self.__name+'_'+feat+'.dat'
+
+        features = np.array(features)
+        norm = np.linalg.norm(features)
+        self.__features = features/norm
+
 
     def __str__(self):
         return 'id: '+str(self.__id)+' year: '+str(self.__year)+' inno: '+str(self.__innovation)
