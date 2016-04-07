@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-__author__ = 'Helias'
+__author__ = 'helias'
 
 
 def loadDataset(path, starting_year=0, ordered=True):

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-__author__ = 'Helias'
+__author__ = 'helias'
 
 
 def get_max_min_pairs(paintings):
