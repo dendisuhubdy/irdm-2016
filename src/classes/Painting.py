@@ -8,6 +8,36 @@ __author__ = 'helias'
 
 
 class Painting:
+    similarities_matrix = None  #numpy matrix of similarities
+
+    @classmethod
+    def get_max(cls, tolerance=0.0):
+        """
+        This is a class method, meaning that it belongs to class and not to particular instances.
+        It returns the pair of the most similar paintings if similarities_matrix is populated, -1,-1 else
+        :param tolerance: values close to 1.0 do not count towards max
+        :return: Integer, Integer
+        """
+        if Painting.similarities_matrix is None: i, j = -1, -1
+        else:
+            similarities = Painting.similarities_matrix.copy()
+            np.fill_diagonal(similarities, -1.0)
+            if tolerance > 0.0: similarities[similarities > 1.0-tolerance] = -1.0
+            i, j = np.unravel_index(similarities.argmax(), similarities.shape)
+        return i, j
+
+    @classmethod
+    def get_min(cls):
+        """
+        This is a class method, meaning that it belongs to class and not to particular instances.
+        It returns the pair of the least similar paintings if similarities_matrix is populated, -1,-1 else
+        :return: Integer, Integer
+        """
+        if Painting.similarities_matrix is None: i, j = -1, -1
+        else:
+            similarities = Painting.similarities_matrix
+            i, j = np.unravel_index(similarities.argmin(), similarities.shape)
+        return i, j
 
     def __init__(self, id_number, year, author, url, school):
         self.__id = id_number
@@ -16,7 +46,6 @@ class Painting:
         self.__url = url
         self.__school = school
         self.__features = None
-        self.__similarities = None
         self.__innovation = np.nan
         self.__set_name()
 
@@ -54,20 +83,41 @@ class Painting:
     def get_innovation(self):
         return self.__innovation
 
-    def set_similarities(self, similarities_list):
-        similarities_list[self.__id] = np.nan
-        self.__similarities = similarities_list
-
     def get_similarity(self, image_id):
-        return self.__similarities[image_id]
+        if Painting.similarities_matrix is None: return -1.0
+        else: return Painting.similarities_matrix[self.__id, image_id]
 
-    def get_max_similarity(self):
-        return self.__similarities.index(np.nanmax(np.asarray(self.__similarities)))
+    def get_max_similarity(self, tolerance=0.0):
+        """
+        returns the index of the most similar painting if similarities are already calculated, -1.0 else
+        :param tolerance: Some paintings appear twice because they belong to two different artists.
+        So they have similarity 1.0. This parameter should be close to zero (e.g. e^-8 in order to reject
+        values close to 1.0 by more than tolerance
+        :return: Integer
+        """
+        if Painting.similarities_matrix is None: return -1.0
+        else:
+            row = Painting.similarities_matrix[self.__id, :].copy()
+            row[self.__id] = -1.0
+            if tolerance > 0.0: row[row > 1.0-tolerance] = -1.0
+            return row.argmax()
 
     def get_min_similarity(self):
-        return self.__similarities.index(np.nanmin(np.asarray(self.__similarities)))
+        """
+        returns the index of the least similar painting if similarities are already calculated, -1.0 else
+        :return: Integer
+        """
+        if Painting.similarities_matrix is None: return -1.0
+        else: return Painting.similarities_matrix[self.__id, :].argmin()
 
-    def save_painting(self, file=None):
+    def save_painting(self, file_name=None):
+        """
+        save_painting loads the painting given the url and saves it to disc under /images/ directory
+        :param file_name: if it is None it just saves the image to disc.
+        If there is a file name it saves the path to the image to that file.
+        This file is used later to generate classemes and picodes features
+        :return:
+        """
         name = self.__name
         path = '../images/'
 
@@ -83,10 +133,10 @@ class Painting:
         img.save(path+name+'.png')
 
         # write image path to listimages.txt file
-        if file is not None:
-            file.write(path[3:]+name+'.png\n')
+        if file_name is not None:
+            file_name.write(path[3:]+name+'.png\n')
 
-    def load_features(self, feats=['GIST', 'picodes2048', 'classemes'], features_path='../features/', images_path='../images/'):
+    def load_features(self, feats=['GIST', 'picodes2048', 'classemes'], features_path='../features/images/', images_path='../images/'):
         """
         load_features takes as input the list of desired features and computes the unary feature vector
         :param feats: the features we want to take into account
@@ -98,6 +148,7 @@ class Painting:
 
         features = []
         if 'GIST' in feats:
+            feats.remove('GIST')
             if images_path is None:
                 image_url = self.__url.replace('/html', '/detail')
                 image_url = image_url.replace('.html', '.jpg')
@@ -113,13 +164,15 @@ class Painting:
             # compute GIST features and append to features
             features.extend(leargist.color_gist(img).tolist())
 
-        for feat in feats:
-            file_name = features_path+self.__name+'_'+feat+'.dat'
+        for feat_name in feats:
+            file_name = features_path+self.__name+'_'+feat_name+'.dat'
+            feat = np.fromfile(file_name, dtype='float32')
+            feat = feat[2:]
+            features.extend(feat.tolist())
 
         features = np.array(features)
         norm = np.linalg.norm(features)
         self.__features = features/norm
-
 
     def __str__(self):
         return 'id: '+str(self.__id)+' year: '+str(self.__year)+' inno: '+str(self.__innovation)

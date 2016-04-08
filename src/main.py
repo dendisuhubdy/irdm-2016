@@ -1,14 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import leargist
 import time
-import requests
-from PIL import Image
-from io import BytesIO
 from collections import defaultdict
-from src.Util import loadDataset
-from paintings_dictionary_functions import get_max_min_pairs, set_innovations
+from Util import loadDataset
+from paintings_dictionary_functions import set_innovations
 from classes.Painting import Painting
 
 # load dataset as a dataFrame
@@ -30,21 +26,16 @@ start = time.time()
 # Process all images -- Create Image objects and add to the dictionary
 for index, row in data.iterrows():
 
-    # get image and calculate GIST vector
-    image_url = row.URL.replace('/html', '/detail')
-    image_url = image_url.replace('.html', '.jpg')
-    response = requests.get(image_url)
-    painting_file = BytesIO(response.content)
-    img = Image.open(painting_file)
-    desc = leargist.color_gist(img)
-
-    # unary feature vector - used later for cosine similarity in matrices form
-    norm = np.linalg.norm(desc)
-    unary_desc = desc/norm
-    features_list.append(unary_desc.tolist())
-
     # create a Painting object and add it to the paintings and years dictionaries
-    painting = Painting(index, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL, desc)
+    painting = Painting(index, int(row.YEAR), row.AUTHOR, row.URL, row.SCHOOL)
+
+    # load features
+    painting.load_features(feats=['GIST', 'picodes2048', 'classemes'])
+
+    # append feature vector to features_list
+    features_list.append(painting.get_features().tolist())
+
+    # append painting to the dictionaries
     paintings[index] = painting
     years[int(row.YEAR)].append(painting)
 
@@ -60,6 +51,8 @@ end = time.time()
 print 'Time to load images: '+str(end - start)
 
 # Calculate similarities between feature vectors
+start = time.time()
+
 # Usage of cosine similarity
 # TODO try different similarity metrics
 # similarities matrix -- efficient way to calculate using matrix form because vectors are unary
@@ -68,18 +61,14 @@ similarities = matrix * matrix_t
 del matrix, matrix_t
 print 'Similarities matrix calculated. Size: '+str(similarities.shape)
 
+end = time.time()
+print 'Time to calculate similarities: '+str(end - start)
+
 # similarities to np.array instead of np.matrix
 similarities = np.asarray(similarities)
 
-# Populate Painting objects with similarities
-print 'Populating Painting objects with similarities'
-for i in range(0, len(similarities)):
-    sim_vector = similarities[i, :].tolist()
-    paintings.get(i).set_similarities(sim_vector)
-print 'Painting objects populated'
-
-# save an image in the default folder
-# paintings.get(9).save_painting()
+# similarities_matrix is shared by all Painting objects
+Painting.similarities_matrix = similarities
 
 # Build histogram of similarities
 # keep only distinct similarities in order to build the histogram
@@ -97,7 +86,10 @@ plt.show()
 # print(paintings.get(i_min).get_similarity(j_min))
 
 # find most and least similar pairs of paintings
-max_sim, max_pair,  min_sim, min_pair = get_max_min_pairs(paintings)
+max_pair = Painting.get_max(0.000001)
+min_pair = Painting.get_min()
+max_sim = paintings.get(max_pair[0]).get_similarity(max_pair[1])
+min_sim = paintings.get(min_pair[0]).get_similarity(min_pair[1])
 
 print str(max_sim)+' '+paintings.get(max_pair[0]).get_url()+' '+paintings.get(max_pair[1]).get_url()
 min_0 = paintings.get(max_pair[0]).get_min_similarity()
