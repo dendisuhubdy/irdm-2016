@@ -40,7 +40,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 5000:
+    if index + 1 == 500:
         break
 
 matrix = np.matrix(features_list)
@@ -79,55 +79,49 @@ Painting.similarities_matrix = similarities
 
 
 # MOST AND LEAST SIMILAR PAINTINGS
-# least similar paintings another way
-# diagonal elements of similarities are equal to 1.0
-# TODO set diagonal elements of similarities equal to nan and use different way to compare - see np.nanmin
-# i_min, j_min = np.unravel_index(similarities.argmin(), similarities.shape)
-# print(paintings.get(i_min).get_similarity(j_min))
 
 # find most and least similar pairs of paintings
-max_pair = Painting.get_max()
-min_pair = Painting.get_min()
-max_sim = paintings.get(max_pair[0]).get_similarity(max_pair[1])
-min_sim = paintings.get(min_pair[0]).get_similarity(min_pair[1])
-
-print str(max_sim)+' '+paintings.get(max_pair[0]).get_url()+' '+paintings.get(max_pair[1]).get_url()
-min_0 = paintings.get(max_pair[0]).get_min_similarity()
-min_1 = paintings.get(max_pair[1]).get_min_similarity()
-print str(paintings.get(max_pair[0]).get_similarity(min_0))+' ' +\
-      paintings.get(max_pair[0]).get_url()+' ' + paintings.get(min_0).get_url()
-print str(paintings.get(max_pair[1]).get_similarity(min_1))+' ' +\
-      paintings.get(max_pair[1]).get_url()+' ' + paintings.get(min_1).get_url()
-print ''
-
-print str(min_sim)+' '+paintings.get(min_pair[0]).get_url()+' '+paintings.get(min_pair[1]).get_url()
-max_0 = paintings.get(min_pair[0]).get_max_similarity()
-max_1 = paintings.get(min_pair[1]).get_max_similarity()
-print str(paintings.get(min_pair[0]).get_similarity(max_0))+' ' +\
-      paintings.get(min_pair[0]).get_url()+' ' + paintings.get(max_0).get_url()
-print str(paintings.get(min_pair[1]).get_similarity(max_1))+' ' +\
-      paintings.get(min_pair[1]).get_url()+' ' + paintings.get(max_1).get_url()
+# max_pair = Painting.get_max()
+# min_pair = Painting.get_min()
+# max_sim = paintings.get(max_pair[0]).get_similarity(max_pair[1])
+# min_sim = paintings.get(min_pair[0]).get_similarity(min_pair[1])
+#
+# print str(max_sim)+' '+paintings.get(max_pair[0]).get_url()+' '+paintings.get(max_pair[1]).get_url()
+# min_0 = paintings.get(max_pair[0]).get_min_similarity()
+# min_1 = paintings.get(max_pair[1]).get_min_similarity()
+# print str(paintings.get(max_pair[0]).get_similarity(min_0))+' ' +\
+#       paintings.get(max_pair[0]).get_url()+' ' + paintings.get(min_0).get_url()
+# print str(paintings.get(max_pair[1]).get_similarity(min_1))+' ' +\
+#       paintings.get(max_pair[1]).get_url()+' ' + paintings.get(min_1).get_url()
+# print ''
+#
+# print str(min_sim)+' '+paintings.get(min_pair[0]).get_url()+' '+paintings.get(min_pair[1]).get_url()
+# max_0 = paintings.get(min_pair[0]).get_max_similarity()
+# max_1 = paintings.get(min_pair[1]).get_max_similarity()
+# print str(paintings.get(min_pair[0]).get_similarity(max_0))+' ' +\
+#       paintings.get(min_pair[0]).get_url()+' ' + paintings.get(max_0).get_url()
+# print str(paintings.get(min_pair[1]).get_similarity(max_1))+' ' +\
+#       paintings.get(min_pair[1]).get_url()+' ' + paintings.get(max_1).get_url()
 
 
 mask = np.zeros(Painting.similarities_matrix.shape, dtype=np.int8)
-years_back = 100
+years_back = 10
 
 for painting in paintings.values():
     year = painting.get_year()
-    id = painting.get_id()
+    p_id = painting.get_id()
     ids = []
     for year_past in range(year-years_back, year):
        ids.extend([p.get_id() for p in years.get(year_past, list())])
     for past_id in ids:
-        mask[past_id, id] = 1
-print np.sum(Painting.similarities_matrix)
+        mask[past_id, p_id] = 1
+
 Painting.similarities_matrix = np.multiply(mask, Painting.similarities_matrix)
 del mask
-print np.sum(Painting.similarities_matrix)
 
 # INNOVATIONS
 # Calculate innovations
-set_innovations(paintings, years, 5, 10)
+set_innovations(paintings, years)
 
 # Create a frame with two columns
 # YEAR, INNOVATION: average innovation per year

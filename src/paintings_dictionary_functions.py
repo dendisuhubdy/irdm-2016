@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from classes.Painting import Painting
+
 __author__ = 'helias'
 
 
@@ -47,42 +49,65 @@ def plot_histogram(similarities_matrix):
     return True
 
 
-def set_innovations(paintings, years, years_back=5, top_paintings=5):
+def set_innovations(paintings, years, alpha=0.5):
     """
-    set_innovations: for each Painting object in the paintings dictionary it sets an innovation metric.
-    That is how innovative is this painting based on the similarity with paintings the previous years
-    Formula: 1.0 - (1/n) * /sum_1^n d_i
-    :param paintings: dictionary from any key (here an integer or painting id) to a Painting object
-    :param years: dictionary from any year to a list of Painting objects created that exact year
-    :param years_back: how many years of not similar paintings make a painting considered as innovative
-    :param top_paintings: most similar paintings over the years_back period
-    :return: It just updates the innovative field of all Paintings objects
+    A method that sets an innovation score for each painting, based on the similarities between paintings
+    The creativity for the painting i is denoted as C(p_i). So based on "Quantifying Creativity in Art Networks":
+    C(p_i) = (1-a)/N + a SUM_j (similarity_ij C(p_j)/ N(p_j)) where N(p_j) = SUM_k (similarity_kj)
+    :param paintings: a dictionary from any key (here an int or painting id) to a Painting object
+    :param years: a dictionary from any year to a list of Painting objects that exact year
+    :param alpha: parameter 0.<=alpha<=1.
+    :return: It updates the innovative field of all Painting objects
     """
-    for key in paintings:
-        # for each painting
-        painting = paintings.get(key)
-        similarity_list = []
+    # estimates (1-a)/N
+    n = len(paintings)
+    creativity_const = (1. - alpha)/n
 
-        # for the last years_back years find the top_paintings more similar paintings
-        for year in range(painting.get_year()-years_back, painting.get_year()):
+    min_year = min(years.keys())
+    max_year = max(years.keys())
 
-            # get a list of all paintings during 'year' year
-            paintings_in_year = years.get(year, list())
-            for painting_year in paintings_in_year:
-                # for each painting during year calculate similarity
-                similarity_list.append(painting.get_similarity(painting_year.get_id()))
+    # estimate creativities of paintings in year min_year
+    for p in years.get(min_year, list()):
+        p.set_innovation(creativity_const)
 
-        # if list is empty meaning no painting during the past year_back years is found
-        if not similarity_list:
-            innovation = 0.0
-        else:
-            # sort and take the average of top_paintings most similar paintings
-            similarity_list.sort(reverse=True)
-            similarity_list = similarity_list[:top_paintings]
-            innovation = np.mean(similarity_list)
+    # estimate creativities of paintings the years after
+    for year in range(min_year+1, max_year+1):
+        # list of paintings in this specific year
+        paintings_in_year = years.get(year, list())
 
-        # set innovation of the painting
-        painting.set_innovation(1.0 - innovation)
+        # iterate through all paintings in this specific year
+        for painting in paintings_in_year:
+            # get painting id
+            pid = painting.get_id()
+
+            # get id of all paintings that influenced current painting
+            # this will be the id of all non zero elements in pid column in similarities matrix
+            column = Painting.similarities_matrix[:, pid]
+            paintings_ids_influenced_current = np.nonzero(column)[0]
+            # paintings_ids_influenced_current = np.argpartition(column, -4)[-4:]
+
+            # estimate creativity of painting
+            creativity_painting = 0.
+
+            for past_id in paintings_ids_influenced_current:
+                # get painting object with id past_id
+                painting_influenced_current = paintings.get(past_id)
+
+                # similarity between painting_influenced_current and painting
+                similarity = Painting.similarities_matrix[past_id, pid]
+                similarity = 1. - similarity
+
+                # estimate parameter N(p_j) = SUM (similarity_kj)
+                # all paintings that painting_influenced_current influenced
+                past_row = Painting.similarities_matrix[past_id, :]
+                past_row = past_row[past_row > 0.]
+                n_p_j = np.sum(1. - past_row)
+
+                creativity_painting += similarity*painting_influenced_current.get_innovation()/n_p_j
+
+            creativity_painting *= alpha
+            creativity_painting += creativity_const
+            painting.set_innovation(creativity_painting)
 
 
 # TODO have not checked that it works
