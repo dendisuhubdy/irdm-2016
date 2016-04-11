@@ -1,9 +1,10 @@
-__author__ = 'helias'
-
 import time
 
 from Util import loadDataset
 from classes.Painting import Painting
+
+__author__ = 'helias'
+
 
 # load dataset as a dataFrame
 # columns: AUTHOR YEAR URL SCHOOL
@@ -21,9 +22,6 @@ for index, row in data.iterrows():
     painting.save_painting(file=list_file)
 
     print(str(index+1)+'th image saved...')
-
-    # if index + 1 == 50:
-    #     break
 
 list_file.close()
 
