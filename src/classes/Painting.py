@@ -11,19 +11,20 @@ class Painting:
     similarities_matrix = None  #numpy matrix of similarities
 
     @classmethod
-    def get_max(cls, tolerance=0.0):
+    def get_max(cls):
         """
         This is a class method, meaning that it belongs to class and not to particular instances.
         It returns the pair of the most similar paintings if similarities_matrix is populated, -1,-1 else
-        :param tolerance: values close to 1.0 do not count towards max
+        Similarities of 1. are not considered
         :return: Integer, Integer
         """
         if Painting.similarities_matrix is None: i, j = -1, -1
         else:
-            similarities = Painting.similarities_matrix.copy()
-            np.fill_diagonal(similarities, -1.0)
-            if tolerance > 0.0: similarities[similarities > 1.0-tolerance] = -1.0
+            similarities = Painting.similarities_matrix
+            similarities[similarities == 1.] = -1.
+            # np.fill_diagonal(similarities, -1.0)
             i, j = np.unravel_index(similarities.argmax(), similarities.shape)
+            similarities[similarities == -1.] = 1.
         return i, j
 
     @classmethod
@@ -36,7 +37,9 @@ class Painting:
         if Painting.similarities_matrix is None: i, j = -1, -1
         else:
             similarities = Painting.similarities_matrix
+            similarities[similarities == 0.] = 2.
             i, j = np.unravel_index(similarities.argmin(), similarities.shape)
+            similarities[similarities == 2.] = 0.
         return i, j
 
     def __init__(self, id_number, year, author, url, school):
@@ -100,7 +103,9 @@ class Painting:
             row = Painting.similarities_matrix[self.__id, :].copy()
             row[self.__id] = -1.0
             if tolerance > 0.0: row[row > 1.0-tolerance] = -1.0
-            return row.argmax()
+            res = row.argmax()
+            del row
+            return res
 
     def get_min_similarity(self):
         """
@@ -108,7 +113,12 @@ class Painting:
         :return: Integer
         """
         if Painting.similarities_matrix is None: return -1.0
-        else: return Painting.similarities_matrix[self.__id, :].argmin()
+        else:
+            row = Painting.similarities_matrix[self.__id].copy()
+            row[row == 0.] = 2.
+            res = row.argmin()
+            del row
+            return res
 
     def save_painting(self, file_name=None):
         """
