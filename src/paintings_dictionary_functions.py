@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
 
 __author__ = 'helias'
 
@@ -28,6 +28,23 @@ __author__ = 'helias'
 #             min_sim, min_pair = sim_least, (key, least_similar)
 #
 #     return max_sim, max_pair, min_sim, min_pair
+
+
+def plot_histogram(similarities_matrix):
+    """
+    given a squared similarities matrix (symmetric) it plots the histogram of the upper triangle
+    :param similarities_matrix: squared symmetric matrix
+    :return: True
+    """
+    # keep only distinct similarities in order to build the histogram
+    triangle = np.triu_indices(len(similarities_matrix), 1)
+    distinct_similarities = np.squeeze(similarities_matrix[triangle])
+
+    my_bins = np.linspace(.0, 1.0, 100)
+    plt.hist(distinct_similarities, bins=my_bins)
+    plt.show()
+
+    return True
 
 
 def set_innovations(paintings, years, years_back=5, top_paintings=5):
@@ -69,12 +86,12 @@ def set_innovations(paintings, years, years_back=5, top_paintings=5):
 
 
 # TODO have not checked that it works
-def paintings_to_csv(paintings, innovations=True, path='../results/'):
-    if innovations:
-        frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation'])
-        for key in paintings.keys:
-            p = paintings.get(key)
-            frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
-                                  'School': p.get_school(), 'URL': p.get_author,
-                                  'Innovation': p.get_innovation()})
-    frame.to_csv(path+'data_with_innovations.csv', ignore_index=True)
+# def paintings_to_csv(paintings, innovations=True, path='../results/'):
+#     if innovations:
+#         frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation'])
+#         for key in paintings.keys:
+#             p = paintings.get(key)
+#             frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
+#                                   'School': p.get_school(), 'URL': p.get_author,
+#                                   'Innovation': p.get_innovation()})
+#     frame.to_csv(path+'data_with_innovations.csv', ignore_index=True)

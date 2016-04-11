@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import time
 from collections import defaultdict
 from Util import loadDataset
-from paintings_dictionary_functions import set_innovations
+from paintings_dictionary_functions import set_innovations, plot_histogram
 from classes.Painting import Painting
 
 # load dataset as a dataFrame
@@ -19,7 +19,6 @@ paintings = dict()
 
 # list of all feature lists -- later will be converted into matrix
 features_list = []
-
 
 # begin timer in order to see how long it takes to process images
 start = time.time()
@@ -68,16 +67,10 @@ print 'Time to calculate similarities: '+str(end - start)
 similarities = np.asarray(similarities)
 
 # similarities_matrix is shared by all Painting objects
-Painting.similarities_matrix = similarities
+Painting.similarities_matrix = similarities.copy()
 
-# Build histogram of similarities
-# keep only distinct similarities in order to build the histogram
-triangle = np.triu_indices(len(similarities), 1)
-distinct_similarities = np.squeeze(similarities[triangle])
-
-my_bins = np.linspace(.0, 1.0, 100)
-plt.hist(distinct_similarities, bins=my_bins)
-plt.show()
+# Histogram
+plot_histogram(similarities)
 
 # least similar paintings another way
 # diagonal elements of similarities are equal to 1.0
