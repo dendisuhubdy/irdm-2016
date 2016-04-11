@@ -1,9 +1,13 @@
+import time
+import gc
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import time
+
 from collections import defaultdict
 from Util import loadDataset
+
 from paintings_dictionary_functions import set_innovations, plot_histogram
 from classes.Painting import Painting
 
@@ -40,7 +44,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 500:
+    if index + 1 == 1000:
         break
 
 matrix = np.matrix(features_list)
@@ -118,10 +122,17 @@ for painting in paintings.values():
 
 Painting.similarities_matrix = np.multiply(mask, Painting.similarities_matrix)
 del mask
+gc.collect()
 
 # INNOVATIONS
 # Calculate innovations
-set_innovations(paintings, years)
+print 'Calculating creativities...'
+start = time.time()
+
+set_innovations(paintings, years, alpha=0.7)
+
+end = time.time()
+print 'Creativities calculated: '+str(end-start)+'secs'
 
 # Create a frame with two columns
 # YEAR, INNOVATION: average innovation per year
@@ -139,3 +150,19 @@ inv_frame.set_index('YEAR', inplace=True)
 inv_frame.sort_index(inplace=True)
 inv_frame.plot()
 plt.show()
+
+innos = []
+for p in paintings.values():
+    innos.append(p.get_innovation())
+
+my_bins = np.linspace(.0, max(innos), 100)
+plt.hist(innos, bins=my_bins)
+plt.show()
+
+max_id = None
+max_val = 0.
+for p in paintings.values():
+    if p.get_innovation() > max_val: max_id, max_val = p.get_id(), p.get_innovation()
+
+print 'Most innovative painting:'
+print paintings.get(max_id).get_url(), paintings.get(max_id)

@@ -102,6 +102,7 @@ def set_innovations(paintings, years, alpha=0.5):
                 past_row = Painting.similarities_matrix[past_id, :]
                 past_row = past_row[past_row > 0.]
                 n_p_j = np.sum(1. - past_row)
+                del past_row
 
                 creativity_painting += similarity*painting_influenced_current.get_innovation()/n_p_j
 
