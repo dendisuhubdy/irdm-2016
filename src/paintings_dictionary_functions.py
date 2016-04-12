@@ -149,13 +149,13 @@ def set_retro(paintings, years, similarities, alpha=0.5):
             painting.set_retro(retro_painting)
 
 
-# TODO change it to save retro score as well
 def paintings_to_csv(paintings, path='../results/'):
-    frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation'])
+    frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation', 'Retro'])
     for p in paintings.values():
         frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
                               'School': p.get_school(), 'URL': p.get_author(),
-                              'Innovation': p.get_innovation()}, ignore_index=True)
+                              'Innovation': p.get_innovation(), 'Retro': p.get_retro()},
+                             ignore_index=True)
     frame.to_csv(path+'data_with_innovations.csv', encoding='utf8', index=False)
     # writer = pd.ExcelWriter(path+'data.xlsx')
     # frame.to_excel(writer, encoding='utf8', index=False)
