@@ -50,6 +50,7 @@ class Painting:
         self.__school = school
         self.__features = None
         self.__innovation = np.nan
+        self.__retro = np.nan
         self.__set_name()
 
     def __set_name(self):
@@ -88,6 +89,12 @@ class Painting:
 
     def get_innovation(self):
         return self.__innovation
+
+    def set_retro(self, retro):
+        self.__retro = retro
+
+    def get_retro(self):
+        return self.__retro
 
     def get_similarity(self, image_id):
         if Painting.similarities_matrix is None: return -1.0
