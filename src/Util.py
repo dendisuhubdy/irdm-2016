@@ -4,7 +4,7 @@ import numpy as np
 __author__ = 'helias'
 
 
-def loadDataset(path, starting_year=0, ordered=True):
+def loadDataset(path, starting_year=0, ending_year = 2016, ordered=True):
     data = pd.read_excel(path)
     data = data[data.FORM == 'painting']
     data = data[['AUTHOR', 'DATE', 'URL', 'SCHOOL']]
@@ -15,6 +15,7 @@ def loadDataset(path, starting_year=0, ordered=True):
     data.reset_index(drop=True, inplace=True)
 
     data = data[data.YEAR >= starting_year]
+    data = data[data.YEAR <= ending_year]
     data.reset_index(drop=True, inplace=True)
 
     # TODO if not ordered shuffle the dataset

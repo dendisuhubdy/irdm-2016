@@ -14,7 +14,7 @@ from classes.Painting import Painting
 
 # load dataset as a dataFrame
 # columns: AUTHOR YEAR URL SCHOOL
-data = loadDataset('../data/catalog.xls', starting_year=1600, ordered=False)
+data = loadDataset('../data/catalog.xls', starting_year=1600, ending_year=1920, ordered=False)
 
 # years dictionary: for each year a list of all Paintings in that year
 years = defaultdict(list)
