@@ -139,22 +139,7 @@ max_year = max(years.keys()) - years_back
 
 plot_points_timeline(paintings, min(years.keys()), max_year)
 
-# Create a frame with two columns
-# YEAR, INNOVATION: average innovation per year
-inv_frame = pd.DataFrame(columns=['YEAR', 'INNOVATION'])
-for year in years.keys():
-    paintings_in_year = years.get(year, list())
-    innovation_list = []
-    for painting in paintings_in_year:
-        innovation_list.append(painting.get_innovation())
-    if innovation_list:
-        inv_frame = inv_frame.append({'YEAR': year, 'INNOVATION': np.mean(innovation_list)},
-                                     ignore_index=True)
-
-inv_frame.set_index('YEAR', inplace=True)
-inv_frame.sort_index(inplace=True)
-inv_frame.plot()
-plt.show()
+plot_timeline(years, min(years.keys()), max_year)
 
 innos = []
 for p in paintings.values():

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 __author__ = 'helias'
@@ -30,6 +31,25 @@ def plot_points_timeline(paintings, min_year, max_year):
             inno.append(p.get_innovation())
 
     plt.plot(year, inno, 'o')
+    plt.show()
+
+    return True
+
+
+def plot_timeline(years, min_year, max_year):
+    frame = pd.DataFrame(columns=['YEAR', 'INNOVATION'])
+    for year in years.keys():
+        if year in range(min_year, max_year):
+            innos = []
+            for painting in years.get(year, list()):
+                innos.append(painting.get_innovation())
+            if innos:
+                frame = frame.append({'YEAR': year, 'INNOVATION': np.mean(innos)},
+                                     ignore_index=True)
+
+    frame.set_index('YEAR', inplace=True)
+    frame.sort_index(inplace=True)
+    frame.plot()
     plt.show()
 
     return True
