@@ -9,6 +9,7 @@ from collections import defaultdict
 from Util import loadDataset
 
 from paintings_dictionary_functions import *
+from plot import *
 from classes.Painting import Painting
 
 # load dataset as a dataFrame
@@ -44,7 +45,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 10:
+    if index + 1 == 100:
         break
 
 matrix = np.matrix(features_list)
@@ -134,7 +135,9 @@ set_innovations(paintings, years, alpha=0.7)
 end = time.time()
 print 'Creativities calculated: '+str(end-start)+'secs'
 
-# paintings_to_csv(paintings)
+max_year = max(years.keys()) - years_back
+
+plot_points_timeline(paintings, min(years.keys()), max_year)
 
 # Create a frame with two columns
 # YEAR, INNOVATION: average innovation per year

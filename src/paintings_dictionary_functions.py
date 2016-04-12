@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from classes.Painting import Painting
 
@@ -31,23 +30,6 @@ __author__ = 'helias'
 #             min_sim, min_pair = sim_least, (key, least_similar)
 #
 #     return max_sim, max_pair, min_sim, min_pair
-
-
-def plot_histogram(similarities_matrix):
-    """
-    given a squared similarities matrix (symmetric) it plots the histogram of the upper triangle
-    :param similarities_matrix: squared symmetric matrix
-    :return: True
-    """
-    # keep only distinct similarities in order to build the histogram
-    triangle = np.triu_indices(len(similarities_matrix), 1)
-    distinct_similarities = np.squeeze(similarities_matrix[triangle])
-
-    my_bins = np.linspace(.0, 1.0, 100)
-    plt.hist(distinct_similarities, bins=my_bins)
-    plt.show()
-
-    return True
 
 
 def set_innovations(paintings, years, alpha=0.5):
