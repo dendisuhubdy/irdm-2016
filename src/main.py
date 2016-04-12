@@ -163,9 +163,9 @@ print 'Retro Scores calculated: '+str(end-start)+'secs'
 
 max_year = max(years.keys()) - years_back
 
-plot_points_timeline(paintings, min(years.keys()), max_year)
+plot_points_timeline(paintings, min(years.keys()), max_year, ['RETRO'])
 
-plot_timeline(years, min(years.keys()), max_year)
+plot_timeline(years, min(years.keys()), max_year, ['INNOVATION'])
 
 innos = []
 for p in paintings.values():

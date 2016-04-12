@@ -22,33 +22,39 @@ def plot_histogram(similarities_matrix):
     return True
 
 
-def plot_points_timeline(paintings, min_year, max_year):
+def plot_points_timeline(paintings, min_year, max_year, plot_type=['INNOVATION', 'RETRO']):
     year = []
     inno = []
+    retro = []
     for p in paintings.values():
         if p.get_year() in range(min_year, max_year):
             year.append(p.get_year())
             inno.append(p.get_innovation())
+            retro.append(p.get_retro())
 
-    plt.plot(year, inno, 'o')
+    if 'INNOVATION' in plot_type: plt.plot(year, inno, 'o')
+    if 'RETRO' in plot_type: plt.plot(year, retro, 'ro')
     plt.show()
 
     return True
 
 
-def plot_timeline(years, min_year, max_year):
-    frame = pd.DataFrame(columns=['YEAR', 'INNOVATION'])
+def plot_timeline(years, min_year, max_year, plot_type=['INNOVATION', 'RETRO']):
+    frame = pd.DataFrame(columns=['YEAR', 'INNOVATION', 'RETRO'])
     for year in years.keys():
         if year in range(min_year, max_year):
             innos = []
+            retros = []
             for painting in years.get(year, list()):
                 innos.append(painting.get_innovation())
+                retros.append(painting.get_retro())
             if innos:
-                frame = frame.append({'YEAR': year, 'INNOVATION': np.mean(innos)},
-                                     ignore_index=True)
+                frame = frame.append({'YEAR': year, 'INNOVATION': np.mean(innos),
+                                      'RETRO': np.mean(retros)}, ignore_index=True)
 
     frame.set_index('YEAR', inplace=True)
     frame.sort_index(inplace=True)
+    frame = frame[plot_type]
     frame.plot()
     plt.show()
 
