@@ -32,7 +32,7 @@ __author__ = 'helias'
 #     return max_sim, max_pair, min_sim, min_pair
 
 
-def set_innovations(paintings, years, alpha=0.5):
+def set_innovations(paintings, years, similarities, alpha=0.5):
     """
     A method that sets an innovation score for each painting, based on the similarities between paintings
     The creativity for the painting i is denoted as C(p_i). So based on "Quantifying Creativity in Art Networks":
@@ -65,7 +65,7 @@ def set_innovations(paintings, years, alpha=0.5):
 
             # get id of all paintings that influenced current painting
             # this will be the id of all non zero elements in pid column in similarities matrix
-            column = Painting.similarities_matrix[:, pid]
+            column = similarities[:, pid]
             paintings_ids_influenced_current = np.nonzero(column)[0]
             # paintings_ids_influenced_current = np.argpartition(column, -4)[-4:]
 
@@ -77,12 +77,12 @@ def set_innovations(paintings, years, alpha=0.5):
                 painting_influenced_current = paintings.get(past_id)
 
                 # similarity between painting_influenced_current and painting
-                similarity = Painting.similarities_matrix[past_id, pid]
+                similarity = similarities[past_id, pid]
                 similarity = 1. - similarity
 
                 # estimate parameter N(p_j) = SUM (similarity_kj)
                 # all paintings that painting_influenced_current influenced
-                past_row = Painting.similarities_matrix[past_id, :]
+                past_row = similarities[past_id, :]
                 past_row = past_row[past_row > 0.]
                 n_p_j = np.sum(1. - past_row)
                 del past_row
@@ -92,6 +92,61 @@ def set_innovations(paintings, years, alpha=0.5):
             creativity_painting *= alpha
             creativity_painting += creativity_const
             painting.set_innovation(creativity_painting)
+
+
+def set_retro(paintings, years, similarities, alpha=0.5):
+    """
+
+    :param paintings:
+    :param years:
+    :param similarities:
+    :param alpha:
+    :return:
+    """
+    n = len(paintings)
+    creativity_const = (1. - alpha)/n
+
+    min_year = min(years.keys())
+    max_year = max(years.keys())
+
+    # estimate retro score of paintings
+    for year in range(min_year, max_year+1):
+        # list of paintings in this specific year
+        paintings_in_year = years.get(year, list())
+
+        # iterate through all paintings in this specific year
+        for painting in paintings_in_year:
+            # get painting id
+            pid = painting.get_id()
+
+            # get id of all paintings that influenced current painting
+            # this will be the id of all non zero elements in pid column in similarities matrix
+            column = similarities[:, pid]
+            paintings_ids_influenced_current = np.nonzero(column)[0]
+            # paintings_ids_influenced_current = np.argpartition(column, -4)[-4:]
+
+            # estimate creativity of painting
+            retro_painting = 0.
+
+            for past_id in paintings_ids_influenced_current:
+                # get painting object with id past_id
+                painting_influenced_current = paintings.get(past_id)
+
+                # similarity between painting_influenced_current and painting
+                similarity = similarities[past_id, pid]
+
+                # estimate parameter N(p_j) = SUM (similarity_kj)
+                # all paintings that painting_influenced_current influenced
+                past_row = similarities[past_id, :]
+                past_row = past_row[past_row > 0.]
+                n_p_j = np.sum(past_row)
+                del past_row
+
+                retro_painting += similarity*painting_influenced_current.get_innovation()/n_p_j
+
+            retro_painting *= alpha
+            retro_painting += creativity_const
+            painting.set_retro(retro_painting)
 
 
 # TODO change it to save retro score as well

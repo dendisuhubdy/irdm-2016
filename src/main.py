@@ -45,7 +45,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 100:
+    if index + 1 == 2000:
         break
 
 matrix = np.matrix(features_list)
@@ -110,27 +110,28 @@ Painting.similarities_matrix = similarities
 
 
 mask = np.zeros(Painting.similarities_matrix.shape, dtype=np.int8)
-years_back = 10
+years_back = 100
 
 for painting in paintings.values():
     year = painting.get_year()
     p_id = painting.get_id()
     ids = []
     for year_past in range(year-years_back, year):
-       ids.extend([p.get_id() for p in years.get(year_past, list())])
+        ids.extend([p.get_id() for p in years.get(year_past, list())])
     for past_id in ids:
         mask[past_id, p_id] = 1
 
-Painting.similarities_matrix = np.multiply(mask, Painting.similarities_matrix)
+similarities = np.multiply(mask, Painting.similarities_matrix)
 del mask
 gc.collect()
+print np.sum(similarities), np.sum(Painting.similarities_matrix)
 
 # INNOVATIONS
 # Calculate innovations
 print 'Calculating creativities...'
 start = time.time()
 
-set_innovations(paintings, years, alpha=0.7)
+set_innovations(paintings, years, similarities, alpha=0.7)
 
 end = time.time()
 print 'Creativities calculated: '+str(end-start)+'secs'
