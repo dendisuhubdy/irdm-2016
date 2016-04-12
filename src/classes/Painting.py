@@ -74,6 +74,9 @@ class Painting:
     def get_url(self):
         return self.__url
 
+    def get_school(self):
+        return self.__school
+
     def set_features(self, features):
         self.__features = features
 
