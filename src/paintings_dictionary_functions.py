@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from classes.Painting import Painting
@@ -111,13 +112,14 @@ def set_innovations(paintings, years, alpha=0.5):
             painting.set_innovation(creativity_painting)
 
 
-# TODO have not checked that it works
-# def paintings_to_csv(paintings, innovations=True, path='../results/'):
-#     if innovations:
-#         frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation'])
-#         for key in paintings.keys:
-#             p = paintings.get(key)
-#             frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
-#                                   'School': p.get_school(), 'URL': p.get_author,
-#                                   'Innovation': p.get_innovation()})
-#     frame.to_csv(path+'data_with_innovations.csv', ignore_index=True)
+# TODO change it to save retro score as well
+def paintings_to_csv(paintings, path='../results/'):
+    frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation'])
+    for p in paintings.values():
+        frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
+                              'School': p.get_school(), 'URL': p.get_author(),
+                              'Innovation': p.get_innovation()}, ignore_index=True)
+    frame.to_csv(path+'data_with_innovations.csv', encoding='utf8', index=False)
+    # writer = pd.ExcelWriter(path+'data.xlsx')
+    # frame.to_excel(writer, encoding='utf8', index=False)
+    # writer.save

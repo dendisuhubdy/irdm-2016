@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from Util import loadDataset
 
-from paintings_dictionary_functions import set_innovations, plot_histogram
+from paintings_dictionary_functions import *
 from classes.Painting import Painting
 
 # load dataset as a dataFrame
@@ -44,7 +44,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 1000:
+    if index + 1 == 10:
         break
 
 matrix = np.matrix(features_list)
@@ -133,6 +133,8 @@ set_innovations(paintings, years, alpha=0.7)
 
 end = time.time()
 print 'Creativities calculated: '+str(end-start)+'secs'
+
+# paintings_to_csv(paintings)
 
 # Create a frame with two columns
 # YEAR, INNOVATION: average innovation per year
