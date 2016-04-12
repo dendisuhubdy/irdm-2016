@@ -45,7 +45,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 2000:
+    if index + 1 == 200:
         break
 
 matrix = np.matrix(features_list)
@@ -108,9 +108,9 @@ Painting.similarities_matrix = similarities
 # print str(paintings.get(min_pair[1]).get_similarity(max_1))+' ' +\
 #       paintings.get(min_pair[1]).get_url()+' ' + paintings.get(max_1).get_url()
 
+years_back = 10
 
 mask = np.zeros(Painting.similarities_matrix.shape, dtype=np.int8)
-years_back = 100
 
 for painting in paintings.values():
     year = painting.get_year()
@@ -124,7 +124,6 @@ for painting in paintings.values():
 similarities = np.multiply(mask, Painting.similarities_matrix)
 del mask
 gc.collect()
-print np.sum(similarities), np.sum(Painting.similarities_matrix)
 
 # INNOVATIONS
 # Calculate innovations
@@ -135,6 +134,32 @@ set_innovations(paintings, years, similarities, alpha=0.7)
 
 end = time.time()
 print 'Creativities calculated: '+str(end-start)+'secs'
+
+
+mask = np.zeros(Painting.similarities_matrix.shape, dtype=np.int8)
+
+for painting in paintings.values():
+    year = painting.get_year()
+    p_id = painting.get_id()
+    ids = []
+    for year_past in range(min(years.keys()), year-years_back):
+        ids.extend([p.get_id() for p in years.get(year_past, list())])
+    for past_id in ids:
+        mask[past_id, p_id] = 1
+
+similarities = np.multiply(mask, Painting.similarities_matrix)
+del mask
+gc.collect()
+
+# RETRO
+# Calculate retro scores
+print 'Calculating retro scores...'
+start = time.time()
+
+set_retro(paintings, years, similarities, alpha=0.7)
+
+end = time.time()
+print 'Retro Scores calculated: '+str(end-start)+'secs'
 
 max_year = max(years.keys()) - years_back
 
