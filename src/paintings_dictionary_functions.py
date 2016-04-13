@@ -66,7 +66,7 @@ def set_innovations(paintings, years, similarities, alpha=0.5):
             # get id of all paintings that influenced current painting
             # this will be the id of all non zero elements in pid column in similarities matrix
             column = similarities[:, pid]
-            paintings_ids_influenced_current = np.nonzero(column)[0]
+            paintings_ids_influenced_current = np.nonzero(column)[0].tolist()
             # paintings_ids_influenced_current = np.argpartition(column, -4)[-4:]
 
             # estimate creativity of painting
@@ -122,7 +122,7 @@ def set_retro(paintings, years, similarities, alpha=0.5):
             # get id of all paintings that influenced current painting
             # this will be the id of all non zero elements in pid column in similarities matrix
             column = similarities[:, pid]
-            paintings_ids_influenced_current = np.nonzero(column)[0]
+            paintings_ids_influenced_current = np.nonzero(column)[0].tolist()
             # paintings_ids_influenced_current = np.argpartition(column, -4)[-4:]
 
             # estimate creativity of painting
@@ -153,13 +153,13 @@ def paintings_to_csv(paintings, path='../results/'):
     frame = pd.DataFrame(columns=['Year', 'Author', 'School', 'URL', 'Innovation', 'Retro'])
     for p in paintings.values():
         frame = frame.append({'Year': p.get_year(), 'Author': p.get_author(),
-                              'School': p.get_school(), 'URL': p.get_author(),
+                              'School': p.get_school(), 'URL': p.get_url(),
                               'Innovation': p.get_innovation(), 'Retro': p.get_retro()},
                              ignore_index=True)
     frame.to_csv(path+'data_with_innovations.csv', encoding='utf8', index=False)
     # writer = pd.ExcelWriter(path+'data.xlsx')
     # frame.to_excel(writer, encoding='utf8', index=False)
-    # writer.save
+    # writer.save()
 
 
 def keep_col_k(matr, k):
@@ -167,7 +167,7 @@ def keep_col_k(matr, k):
     rows, columns = matr.shape
     for col in range(0, columns):
         column = matr[:, col]
-        indices = np.argpartition(column, -k)[-k:]
+        indices = np.argpartition(column, -k)[-k:].tolist()
         for ind in indices: mask[ind, col] = 1
     matr = np.multiply(mask, matr)
     del mask
