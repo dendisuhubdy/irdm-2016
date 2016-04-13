@@ -58,4 +58,4 @@ def plot_timeline(years, min_year, max_year, plot_type=['INNOVATION', 'RETRO']):
     frame.plot()
     plt.show()
 
-    return True
+    return frame
