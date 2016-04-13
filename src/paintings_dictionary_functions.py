@@ -160,3 +160,16 @@ def paintings_to_csv(paintings, path='../results/'):
     # writer = pd.ExcelWriter(path+'data.xlsx')
     # frame.to_excel(writer, encoding='utf8', index=False)
     # writer.save
+
+
+def keep_col_k(matr, k):
+    mask = np.zeros(matr.shape, dtype=np.int8)
+    rows, columns = matr.shape
+    for col in range(0, columns):
+        column = matr[:, col]
+        indices = np.argpartition(column, -k)[-k:]
+        for ind in indices: mask[ind, col] = 1
+    matr = np.multiply(mask, matr)
+    del mask
+    return matr
+

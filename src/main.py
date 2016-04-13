@@ -45,7 +45,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 200:
+    if index + 1 == 2000:
         break
 
 matrix = np.matrix(features_list)
@@ -123,6 +123,7 @@ for painting in paintings.values():
 
 similarities = np.multiply(mask, Painting.similarities_matrix)
 del mask
+similarities = keep_col_k(similarities, 27)
 gc.collect()
 
 # INNOVATIONS
@@ -149,6 +150,7 @@ for painting in paintings.values():
 
 similarities = np.multiply(mask, Painting.similarities_matrix)
 del mask
+similarities = keep_col_k(similarities, 27)
 gc.collect()
 
 # RETRO
