@@ -7,7 +7,6 @@ from numpy import linalg as la
 from collections import defaultdict
 from Util import loadDataset
 
-from paintings_dictionary_functions import *
 from plot import *
 from classes.Painting import Painting
 
@@ -44,7 +43,7 @@ for index, row in data.iterrows():
 
     print(str(index+1)+'th image processed...')
 
-    if index + 1 == 2000:
+    if index + 1 == 5000:
         break
 
 matrix = np.matrix(features_list)
@@ -122,7 +121,12 @@ init_vec = np.asmatrix(init_vec)
 # print np.sum(sim, axis=1)
 
 # PAGE RANK
+print 'Calculating Page Rank...'
+start = time.time()
 mat = la.matrix_power(sim, 200)
+end = time.time()
+print 'Time to calculate power of similarities matrix: '+str(end-start)
+
 significance = init_vec*mat
 
 significance = np.asarray(significance)
@@ -134,3 +138,4 @@ indices = significance.argsort()[-10:][::1].tolist()
 
 for i in indices:
     print paintings.get(i).get_url(), significance[i]
+
