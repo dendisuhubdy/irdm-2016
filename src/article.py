@@ -1,9 +1,6 @@
 import time
-import gc
 
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import normalize
 from numpy import linalg as la
@@ -92,35 +89,48 @@ for painting in paintings.values():
     for past_id in ids:
         mask[past_id, p_id] = 1
 
+# use mask to put zero similarities from future to past paintings
 Painting.similarities_matrix = np.multiply(mask, Painting.similarities_matrix)
+
+# find mean similarity
 mean = 1. * np.sum(Painting.similarities_matrix)/np.sum(mask)
+
+# substract mean from similarity! this will introduce negative similarities
 Painting.similarities_matrix = Painting.similarities_matrix - mean
+
+# use mask again to put zero similarities from future to past paintings
 Painting.similarities_matrix = np.multiply(mask, Painting.similarities_matrix)
 del mask
 
+# change direction of negative similarities
 sim1 = np.clip(Painting.similarities_matrix, 0, 1)
 sim2 = np.clip(Painting.similarities_matrix, -1, 0)
 sim2 *= -1
 sim2 = sim2.transpose()
 sim = sim1 + sim2
+
+# we want important nodes to have incoming edges and not outcoming
 sim = sim.transpose()
 sim = normalize(sim, norm='l1', axis=1)
 sim = np.asmatrix(sim)
 
+# vector with equal initial probability to each node in the network
 init_vec = np.ones(sim.shape[0])/sim.shape[0]
 init_vec = np.asmatrix(init_vec)
 
 # print sim.shape
 # print np.sum(sim, axis=1)
 
-
-mat = la.matrix_power(sim, 100)
+# PAGE RANK
+mat = la.matrix_power(sim, 200)
 significance = init_vec*mat
 
 significance = np.asarray(significance)
 significance = significance[0, :]
+print 'Sum of Page Rank results! It should be one: '+str(np.sum(significance))
 
-indices = np.argpartition(significance, -10)[-10:].tolist()
+indices = significance.argsort()[-10:][::1].tolist()
+# indices = np.argpartition(significance, -10)[-10:].tolist()
 
 for i in indices:
     print paintings.get(i).get_url(), significance[i]
