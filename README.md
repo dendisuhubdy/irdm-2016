@@ -61,28 +61,31 @@ Literature Review
 
 Results
 -------
-Most similar paintings:
-![Regatta at Sainte-Adresse](http://www.wga.hu/detail/m/monet/01/early16.jpg "Regatta at Sainte-Adressequot;") ![enter image description here](http://www.wga.hu/detail/m/monet/01/early18.jpg "The Regatta at Sainte-Adresse2")
-It seems like the same painting with slightly different colours appear twice in the dataset. Score: **0.8866**
+> **Most similar paintings:**
+> - ![Regatta at Sainte-Adresse](http://www.wga.hu/detail/m/monet/01/early16.jpg "Regatta at Sainte-Adressequot;")
+> - ![](http://www.wga.hu/detail/m/monet/01/early18.jpg "The Regatta at Sainte-Adresse2")
+> - It seems like the same painting with slightly different colours appear twice in the dataset. Score: **0.8866**
 
-Most different paintings:
-![The Drunken Silenus](http://www.wga.hu/detail/r/rubens/22mythol/27mythol.jpg "The Drunken Silenus")
-![The Grosse Gehege near Dresden](http://www.wga.hu/detail/f/friedric/4/410fried.jpg "The Grosse Gehege near Dresden")
-The paintings are quite different with similarity score: **0.188156**
-Interestingly enough the most similar painting to Ruben's *Silenus* is the *The Drunken Hercules* of the same artist. The similarities between the two paintings are obvious:
-![The Drunken Hercules](http://www.wga.hu/detail/r/rubens/21mythol/09mythol.jpg "The Drunken Hercules")
+> **Most different paintings:**
+> - ![The Drunken Silenus](http://www.wga.hu/detail/r/rubens/22mythol/27mythol.jpg "The Drunken Silenus")
+> - ![The Grosse Gehege near Dresden](http://www.wga.hu/detail/f/friedric/4/410fried.jpg "The Grosse Gehege near Dresden")
+> - The paintings are quite different with similarity score: **0.188156**
+> - Interestingly enough the most similar painting to Ruben's *Silenus* is the *The Drunken Hercules* of the same artist. The similarities between the two paintings are obvious:
+>  - ![The Drunken Hercules](http://www.wga.hu/detail/r/rubens/21mythol/09mythol.jpg "The Drunken Hercules")
+
 
 **PageRank** analysis on the network:
-After performing PageRank analysis on the network proposed by *Elgammal* and *Saleh* we end that the top-10 bost important (novel and influential) nodes of the network are the following:
-http://www.wga.hu/html/l/lane/owlshead.html 0.000473825164847
-http://www.wga.hu/html/b/beraud/selfport.html 0.00048041151832
-http://www.wga.hu/html/k/kroyer/zbathing.html 0.000480969828368
-http://www.wga.hu/html/f/friedric/3/307fried.html 0.000489828919249
-http://www.wga.hu/html/c/courbet/4/courb400.html 0.000495143706113
-http://www.wga.hu/html/f/friedric/1/107fried.html 0.00049721862977
-http://www.wga.hu/html/f/friedric/3/306fried.html 0.000511199334791
-http://www.wga.hu/html/b/beruete/manzana2.html 0.000520213748859
-http://www.wga.hu/html/f/friedric/4/409fried.html 0.000660883742561
-http://www.wga.hu/html/f/friedric/4/410fried.html 0.000748484616618
 
+After performing PageRank analysis on the network proposed by *Elgammal* and *Saleh* we end that the top-10 bost important (novel and influential) nodes of the network are the following:
+
+ - http://www.wga.hu/html/l/lane/owlshead.html 0.000473825164847
+ - http://www.wga.hu/html/b/beraud/selfport.html 0.00048041151832
+ - http://www.wga.hu/html/k/kroyer/zbathing.html 0.000480969828368
+ - http://www.wga.hu/html/f/friedric/3/307fried.html 0.000489828919249
+ - http://www.wga.hu/html/c/courbet/4/courb400.html 0.000495143706113
+ - http://www.wga.hu/html/f/friedric/1/107fried.html 0.00049721862977
+ - http://www.wga.hu/html/f/friedric/3/306fried.html 0.000511199334791
+ - http://www.wga.hu/html/b/beruete/manzana2.html 0.000520213748859
+ - http://www.wga.hu/html/f/friedric/4/409fried.html 0.000660883742561
+ - http://www.wga.hu/html/f/friedric/4/410fried.html 0.000748484616618
 
